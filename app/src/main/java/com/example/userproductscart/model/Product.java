@@ -35,8 +35,11 @@ public class Product {
         this.name = name;
     }
 
-
-
+    public Product(String name, List<Variant> variants) {
+        type = VARIANTS_BASED;
+        this.name = name;
+        this.variants = variants;
+    }
 
     public void fromVariantStrings(String[] vs){
 
