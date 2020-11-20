@@ -71,20 +71,20 @@ android:padding="8dp">
     app:layout_constraintTop_toTopOf="@+id/quantity"
     app:srcCompat="@drawable/ic_increment" />
 
-<Button
-    android:id="@+id/add_btn"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_marginStart="8dp"
-    android:layout_marginEnd="8dp"
-    android:backgroundTint="@color/colorAccent"
-    android:drawableLeft="@drawable/ic_increment"
-    android:text="Add"
-    android:visibility="gone"
-    app:layout_constraintBottom_toBottomOf="parent"
-    app:layout_constraintEnd_toEndOf="@+id/increment_btn"
-    app:layout_constraintStart_toEndOf="@id/barrier"
-    app:layout_constraintTop_toTopOf="parent" />
+    <Button
+        android:id="@+id/add_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:backgroundTint="#AB47BC"
+        android:drawableLeft="@drawable/ic_increment"
+        android:text="Add"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/increment_btn"
+        app:layout_constraintStart_toEndOf="@id/barrier"
+        app:layout_constraintTop_toTopOf="parent" />
 
 <androidx.constraintlayout.widget.Barrier
     android:id="@+id/barrier"
@@ -95,13 +95,13 @@ android:padding="8dp">
     tools:layout_editor_absoluteX="403dp"
     tools:layout_editor_absoluteY="8dp" />
 
-<androidx.constraintlayout.widget.Group
-    android:id="@+id/qty_group"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:visibility="visible"
-    app:constraint_referenced_ids="increment_btn,quantity,decrement_btn"
-    tools:layout_editor_absoluteX="8dp"
-    tools:layout_editor_absoluteY="8dp" />
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/qty_group"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:constraint_referenced_ids="increment_btn,quantity,decrement_btn"
+        tools:layout_editor_absoluteX="8dp"
+        tools:layout_editor_absoluteY="8dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

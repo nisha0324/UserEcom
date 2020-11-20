@@ -2,6 +2,7 @@ package com.example.userproductscart;
 
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.view.LayoutInflater;
 import android.view.View;
 
@@ -18,7 +19,7 @@ public class VariantPickerDialog {
     private Product product;
     private DialogVariantPickerBinding b;
 
-    public void show(Context context, Cart cart, Product product, final OnWeightPickedListener listener){
+    public void show(Context context, Cart cart, Product product, final OnVariantPickedListener listener){
         this.context = context;
         this.cart = cart;
         this.product = product;
@@ -28,7 +29,23 @@ public class VariantPickerDialog {
         new AlertDialog.Builder(context)
                 .setTitle("Pick Variants")
                 .setView(b.getRoot())
-                .setPositiveButton("SELECT",null)
+                .setPositiveButton("SELECT", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        int qty = cart.totalVariantQtyMap.get(product.name);
+                        if (qty > 0)
+                            listener.onQtyUpdated(qty);
+                        else
+                            listener.onRemoved();
+                    }
+                })
+                .setNegativeButton("REMOVE ALL", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        cart.removeAllVariantsFromCart(product);
+                        listener.onRemoved();
+                    }
+                })
                 .show();
 
         showVariants();
@@ -42,9 +59,21 @@ public class VariantPickerDialog {
                                                                     , b.getRoot()
                                                                     , true);
 
-            ib.variantName.setText(variant.toString());
+            ib.variantName.setText(variant.nameAndPriceString());
 
+            showPreviouslyQty(variant, ib);
             setUpButtons(variant , ib);
+        }
+    }
+
+    private void showPreviouslyQty(Variant variant, VariantItemBinding ib) {
+        int qty = cart.getVariantQty(product, variant);
+
+        if (qty > 0){
+            ib.remove.setVisibility(View.VISIBLE);
+            ib.qty.setVisibility(View.VISIBLE);
+
+            ib.qty.setText(qty + "");
         }
     }
 
@@ -76,8 +105,8 @@ public class VariantPickerDialog {
         });
     }
 
-    interface OnWeightPickedListener{
-        void onWeightPicked();
-        void onWeightPickerCancelled();
+    public interface OnVariantPickedListener {
+        void onQtyUpdated(int qty);
+        void onRemoved();
     }
 }

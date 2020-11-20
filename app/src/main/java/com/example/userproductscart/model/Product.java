@@ -23,6 +23,7 @@ public class Product {
 
     //Weight Based constructor
     public Product(String name, int pricePerKg, float minQty) {
+        type = WEIGHT_BASED;
         this.name = name;
         this.pricePerKg = pricePerKg;
         this.minQty = minQty;
@@ -66,8 +67,15 @@ public class Product {
         return variantsString
                 .replaceFirst("\\[", "")
                 .replaceFirst("]", "")
-                .replaceAll(",", "\n");
+                .replaceAll(",", ", ");
     }
 
+
+    public String priceString(){
+        if(type == Product.WEIGHT_BASED)
+            return "Rs. " + pricePerKg + "/kg";
+
+        return variantsString();
+    }
 
 }

@@ -18,7 +18,7 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
 
     private ActivityMainBinding b;
-    private Cart cart;
+    private Cart cart = new Cart() ;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,21 +29,11 @@ public class MainActivity extends AppCompatActivity {
         setUpProductsList();
     }
 
-    private void showVariantPicker() {
-        Product product = new Product("rice");
-        product.variants = Arrays.asList(
-                new Variant("1kg", 50)
-                , new Variant("5kg", 250)
-        );
-
-         new VariantPickerDialog().show(this,new Cart(), product,null);
-
-    }
 
     private void setUpProductsList() {
         List<Product> products = getProducts();
 
-        ProductsAdaptor adaptor = new ProductsAdaptor(this, products);
+        ProductsAdaptor adaptor = new ProductsAdaptor(this, products, cart);
         b.productList.setAdapter(adaptor);
         b.productList.setLayoutManager(new LinearLayoutManager(this));
     }

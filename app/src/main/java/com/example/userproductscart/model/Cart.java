@@ -2,6 +2,7 @@ package com.example.userproductscart.model;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.List;
 
 public class Cart {
 
@@ -17,53 +18,54 @@ public class Cart {
             CartItem previousValue =map.get(fullName);
 
             previousValue.qty++;
-            subTotal += previousValue.price;
+            previousValue.price += variant.price ;
+
         }else {
             map.put(fullName, new CartItem(fullName, variant.price));
         }
 
          noOfItems++;
-        subTotal += variant.price;
+         subTotal += variant.price;
 
         if (totalVariantQtyMap.containsKey(product.name)){
             int totalQty = totalVariantQtyMap.get(product.name);
             totalQty++;
             totalVariantQtyMap.put(product.name, totalQty);
+
         }else {
             totalVariantQtyMap.put(product.name, 1);
         }
 
 
-        return (int) map.get(fullName).qty; //TODO : why it has been typecasted to int
+        return (int) map.get(fullName).qty;
     }
 
     public int removeFromCart(Product product, Variant variant) {
         String fullName = product.name + " "+ variant.name;
 
-        map.get(fullName).qty--;
+        CartItem existingCartItem = map.get(fullName);
+        existingCartItem.qty--;
+        existingCartItem.price -= variant.price;
 
-        int qty = (int) map.get(fullName).qty;
-        if (qty == 0)
+
+        if(map.get(fullName).qty == 0)
             map.remove(fullName);
 
         noOfItems--;
         subTotal -= variant.price;
 
-        int totalQty = totalVariantQtyMap.get(product.name);
-        totalQty--;
-        if (totalQty == 0)
-            totalVariantQtyMap.remove(product.name);
-        else
-            totalVariantQtyMap.put(product.name, totalQty);
+        int totalQty = totalVariantQtyMap.get(product.name) - 1;
+        totalVariantQtyMap.put(product.name, totalQty);
 
-        return qty;
+        if (totalVariantQtyMap.get(product.name) == 0)
+            totalVariantQtyMap.remove(fullName);
+
+
+        return map.containsKey(fullName) ? (int) map.get(fullName).qty : 0;
     }
 
 
-    public void updateWeightBasedProductQuantity(Product product, float qty){
-        int price = (int) qty * product.pricePerKg;
-        map.put(product.name, new CartItem(product.name, price, qty));
-    }
+
 
     public void removeAllVariantsFromCart(Product product){
         for(Variant variant : product.variants){
@@ -72,6 +74,8 @@ public class Cart {
             if(map.containsKey(key)){
                 subTotal -= map.get(key).price;
                 noOfItems -= map.get(key).qty;
+
+                map.remove(key);
             }
         }
 
@@ -85,7 +89,7 @@ public class Cart {
         int newPrice = (int) (product.pricePerKg * qty);
 
         if (map.containsKey(product.name)){
-            subTotal -= map.get(product.name).price;
+            subTotal -= map.get(product.name).price; //TODO
         }else
             noOfItems++;
 
@@ -100,5 +104,14 @@ public class Cart {
 
             map.remove(product.name);
         }
+    }
+
+    public int getVariantQty(Product product, Variant variant) {
+        String key = product.name + " "+ variant.name;
+
+        if (map.containsKey(key))
+                  return (int) map.get(key).qty;
+
+        return 0;
     }
 }

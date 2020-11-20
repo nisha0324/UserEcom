@@ -16,7 +16,7 @@ public class WeightPicker {
     private Cart cart;
     private Product product;
 
-    public void show(Context context, Cart cart, Product product, final VariantPickerDialog.OnWeightPickedListener listener){
+    public void show(Context context, Cart cart, Product product, final OnWeightPickedListener listener){
         b = WeightPickerDialogBinding.inflate(LayoutInflater.from(context));
 
         this.cart = cart;
@@ -25,7 +25,7 @@ public class WeightPicker {
         new AlertDialog.Builder(context)
                 .setTitle("Pick Weight")
                 .setView(b.getRoot())
-                .setPositiveButton("SeleCT", new DialogInterface.OnClickListener() {
+                .setPositiveButton("SELECT", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
 
@@ -37,22 +37,35 @@ public class WeightPicker {
                         }
 
                         changeInCart(kg + (g/1000f));
+                        listener.onWeightPicked(kg, g);
                     }
                 })
                 .setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        listener.onWeightPickerCancelled();
+
+                        cart.removeWBFromCart(product);
+                        listener.onRemoved();
                     }
                 })
                 .show();
 
         setupNumberPicker();
+        showPreviouslySelectedQty();
+    }
+
+    private void showPreviouslySelectedQty() {
+        if (cart.map.containsKey(product.name)){
+            float qty = cart.map.get(product.name).qty;
+
+            b.numberPickerKg.setValue((int) qty);
+            b.numberPickerG.setValue((int)  (qty - (int) qty) * 1000 / 50);
+        }
     }
 
     private void setupNumberPicker() {
         float quantity = product.minQty;
-        b.numberPickerKg.setMinValue((int) (quantity / 1000));
+        b.numberPickerKg.setMinValue((int) (quantity));
         b.numberPickerKg.setMaxValue(10);
         b.numberPickerG.setMinValue((int) (quantity % 1000) / 50);
         b.numberPickerG.setMaxValue(19);
@@ -84,11 +97,11 @@ public class WeightPicker {
     }
 
     private void changeInCart(float qty) {
-        cart.updateWeightBasedProductQuantity(product, qty);
+        cart.updateWBQuantity(product, qty);
     }
 
-    interface OnWeightPickedListener{
+    public interface OnWeightPickedListener{
         void onWeightPicked(int kg, int g);
-        void onWeightPickerCancelled();
+        void onRemoved();
     }
 }

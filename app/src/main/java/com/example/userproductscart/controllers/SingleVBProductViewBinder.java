@@ -10,7 +10,9 @@ import com.example.userproductscart.model.Cart;
 import com.example.userproductscart.model.Product;
 
 
-public class SingleVBProductViewBinder {private ProductItemSingleVbBinding b;
+public class SingleVBProductViewBinder {
+
+    private ProductItemSingleVbBinding b;
 
     public void bind(ProductItemSingleVbBinding b, final Product product, final Cart cart){
         this.b = b;
