@@ -1,5 +1,6 @@
 package com.example.userproductscart;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
@@ -8,8 +9,12 @@ import android.view.View;
 
 import com.example.userproductscart.databinding.ActivityMainBinding;
 import com.example.userproductscart.model.Cart;
+import com.example.userproductscart.model.Inventory;
 import com.example.userproductscart.model.Product;
 import com.example.userproductscart.model.Variant;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.firestore.DocumentSnapshot;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -18,7 +23,9 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
 
     private ActivityMainBinding b;
+    private MyApp app;
     private Cart cart = new Cart() ;
+    private List<Product> products;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,7 +33,43 @@ public class MainActivity extends AppCompatActivity {
         b = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(b.getRoot());
 
+        app = (MyApp) getApplicationContext();
+        loadData();
         setUpProductsList();
+    }
+
+    private void loadData() {
+        if(app.isOffline()){
+            app.showToast(this, "Unable to save. You are offline!");
+            return;
+        }
+
+        app.showLoadingDialog(this);
+
+        app.db.collection("inventory")
+                .document("products")
+                .get()
+                .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                    @Override
+                    public void onSuccess(DocumentSnapshot documentSnapshot) {
+                        if(documentSnapshot.exists()){
+                            Inventory inventory = documentSnapshot.toObject(Inventory.class);
+                            products = inventory.products;
+                        }
+                        else
+                            products = new ArrayList<>();
+                        setUpProductsList();
+                        app.hideLoadingDialog();
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        app.hideLoadingDialog();
+                        app.showToast(MainActivity.this, e.getMessage());
+                        e.printStackTrace();
+                    }
+                });
     }
 
 
@@ -61,6 +104,6 @@ public class MainActivity extends AppCompatActivity {
             b.cartSummary.setText("Total : Rs. " + cart.subTotal + "\n" + cart.noOfItems + " items");
         }
     }
-
+    
 
 }
