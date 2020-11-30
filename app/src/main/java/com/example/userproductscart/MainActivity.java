@@ -15,6 +15,7 @@ import com.example.userproductscart.model.Variant;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -35,7 +36,9 @@ public class MainActivity extends AppCompatActivity {
 
         app = (MyApp) getApplicationContext();
         loadData();
-        setUpProductsList();
+
+        FirebaseMessaging.getInstance()
+                .subscribeToTopic("users");
     }
 
     private void loadData() {
@@ -74,26 +77,13 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void setUpProductsList() {
-        List<Product> products = getProducts();
 
         ProductsAdaptor adaptor = new ProductsAdaptor(this, products, cart);
         b.productList.setAdapter(adaptor);
         b.productList.setLayoutManager(new LinearLayoutManager(this));
     }
 
-    private List<Product> getProducts() {
-       return Arrays.asList(
-                new Product("Bread", Arrays.asList(
-                        new Variant("big", 10)
-                        , new Variant("small", 20)
-                        , new Variant("medium", 30)
-                ))
-                , new Product("Apple", 30, 1)
-                , new Product("Kiwi", Arrays.asList(
-                        new Variant("1kg", 100)
-                ))
-        );
-    }
+
 
     public void updateCartSummary(){
         if(cart.noOfItems == 0){
