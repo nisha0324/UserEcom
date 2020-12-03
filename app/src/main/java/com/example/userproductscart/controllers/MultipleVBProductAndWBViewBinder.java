@@ -1,16 +1,13 @@
 package com.example.userproductscart.controllers;
 
-import android.app.Activity;
 import android.content.Context;
 import android.view.View;
 import android.widget.Toast;
 
 import com.example.userproductscart.MainActivity;
-import com.example.userproductscart.VariantPickerDialog;
-import com.example.userproductscart.WeightPicker;
-import com.example.userproductscart.databinding.ActivityMainBinding;
+import com.example.userproductscart.dialog.VariantPickerDialog;
+import com.example.userproductscart.dialog.WeightPicker;
 import com.example.userproductscart.databinding.ProductItemWbMultiVbBinding;
-import com.example.userproductscart.databinding.WeightPickerDialogBinding;
 import com.example.userproductscart.model.Cart;
 import com.example.userproductscart.model.Product;
 

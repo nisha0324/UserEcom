@@ -13,6 +13,7 @@ import com.example.userproductscart.R;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
+import java.util.Map;
 import java.util.Random;
 
 public class MyFCMServices extends FirebaseMessagingService {
@@ -22,17 +23,18 @@ public class MyFCMServices extends FirebaseMessagingService {
     @Override
     public void onMessageReceived(@NonNull RemoteMessage remoteMessage) {
         super.onMessageReceived(remoteMessage);
+        createNotificationChannel();
+        Map<String, String> data = remoteMessage.getData();
 
         String version = remoteMessage.getData()
-                .get("version");
+               .get("version");
 
 
 
-        Log.e("fcmDemo", "version - " + version);
+       Log.e("fcmDemo", "version - " + version);
         Log.e("fcmDemo", "notifTitle - " + remoteMessage.getNotification().getTitle());
-        Log.e("fcmDemo", "notifBody - " + remoteMessage.getNotification().getBody());
+        Log.e("fcmDemo", "notifBody - " + remoteMessage.getNotification().getBody());  //TODO:error
 
-        createNotificationChannel();
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_increment)
