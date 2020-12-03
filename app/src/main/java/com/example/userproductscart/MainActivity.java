@@ -79,30 +79,16 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onUserDataEntered(Order order) {
 
+                        if(app.isOffline()){
+                            app.showToast(MainActivity.this, "Unable to save. You are offline!");
+                            return;
+                        }
+
                         //orderId set
                         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
                         order.orderId = " " + currentUser.getUid()+ order.orderPlacedTs;
 
-
-                        app.db.collection("Orders")
-                                .document()
-                                .set(order)
-                                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                    @Override
-                                    public void onSuccess(Void aVoid) {
-                                        Toast.makeText(MainActivity.this, "Saved!", Toast.LENGTH_SHORT).show();
-                                        app.hideLoadingDialog();
-                                        sendNotification();
-                                    }
-                                })
-                                .addOnFailureListener(new OnFailureListener() {
-                                    @Override
-                                    public void onFailure(@NonNull Exception e) {
-                                        Toast.makeText(MainActivity.this, "Failed to save on cloud", Toast.LENGTH_SHORT).show();
-                                        app.hideLoadingDialog();
-                                        e.printStackTrace();
-                                    }
-                                });
+                        saveUserData(order);
 
                     }
 
@@ -115,8 +101,31 @@ public class MainActivity extends AppCompatActivity {
                 });
     }
 
-    private void sendNotification() {
-        String message = MessageFormatter.getSampleMessage("Test1","Test1","users");
+    //To save order on firebase
+    private void saveUserData(Order order) {
+        app.db.collection("Orders")
+                .document()
+                .set(order)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Toast.makeText(MainActivity.this, "Saved!", Toast.LENGTH_SHORT).show();
+                        app.hideLoadingDialog();
+                        sendNotification(order);
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Toast.makeText(MainActivity.this, "Failed to save on cloud", Toast.LENGTH_SHORT).show();
+                        app.hideLoadingDialog();
+                        e.printStackTrace();
+                    }
+                });
+    }
+
+    private void sendNotification(Order order) {
+        String message = MessageFormatter.getSampleMessage("admin","new Order","Order from "+ order.userName);
 
         new MyFCMsender()
                 .send(message, new Callback() {
@@ -148,6 +157,7 @@ public class MainActivity extends AppCompatActivity {
                 });
     }
 
+    //To load data from firebase
     private void loadData() {
         if(app.isOffline()){
             app.showToast(this, "Unable to save. You are offline!");
@@ -194,8 +204,6 @@ public class MainActivity extends AppCompatActivity {
         b.productList.setLayoutManager(new LinearLayoutManager(this));
     }
 
-
-
     public void updateCartSummary(){
         if(cart.noOfItems == 0){
             b.checkout.setVisibility(View.GONE);
@@ -207,53 +215,5 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-   /* public void setUpCheckOut(){
-          b.checkout.setOnClickListener(new View.OnClickListener() {
-              @Override
-              public void onClick(View v) {
-                    sendData();
-              }
-          });
-    }*/
-
-    private void sendData() {
-        if(app.isOffline()){
-            app.showToast(this, "Unable to save. You are offline!");
-            return;
-        }
-
-        app.showLoadingDialog(this);
-
-        //from cart to order
-        order.cartItems = new ArrayList<>(cart.map.values());
-        order.subTotal = cart.subTotal;
-
-
-        //orderId set
-        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
-        order.orderId = " " + currentUser.getUid()+ order.orderPlacedTs;
-
-
-        app.db.collection("Orders")
-                .document()
-                .set(order)
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        Toast.makeText(MainActivity.this, "Saved!", Toast.LENGTH_SHORT).show();
-                        app.hideLoadingDialog();
-                        sendNotification();
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(MainActivity.this, "Failed to save on cloud", Toast.LENGTH_SHORT).show();
-                        app.hideLoadingDialog();
-                        e.printStackTrace();
-                    }
-                });
-
-    }
 
 }
